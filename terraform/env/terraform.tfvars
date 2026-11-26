@@ -1,0 +1,328 @@
+# Copyright (c) 2026 Accenture, All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# =========================================================================
+#  DO NOT ENTER SECRETS IN THIS FILE. THIS IS A SAMPLE FILE
+#  
+#  Horizon SDV Configuration file.
+#  
+#  Create a new file with name "terraform.tfvars" in the current directory.
+#  Enter the Secrets and other required details in "terraform.tfvars".
+# =========================================================================
+
+# GCP Configuration 
+sdv_gcp_project_id       = "polar-land-339003"
+sdv_gcp_region           = "asia-south1"
+sdv_gcp_zone             = "asia-south1-a"
+# Optional: zones of the Android and ABFS build node pools. Left out, they stay in sdv_gcp_zone.
+# List several zones that offer the build machine type so that a capacity shortage in one
+# zone does not stop the builds. The node limit of a pool then counts for the whole pool.
+# sdv_build_node_locations = ["europe-west1-b", "europe-west1-c", "europe-west1-d"]
+sdv_gcp_compute_sa_email = "998040854938-compute@developer.gserviceaccount.com"
+sdv_gcp_backend_bucket   = "rv_mygcp_horizon_bucket"
+
+#  Environment Metadata 
+sdv_env_name        = "dev"
+sdv_root_domain     = "rvmygcphorizon.com"
+
+
+# SCM Configuration (Source Code Management)
+# SCM Type
+# - "github": Use when hosting on GitHub (enables GitHub-specific features like PR discovery)
+# - "git": Use for any other Git server (Gerrit, GitLab, Gitea, Bitbucket, self-hosted Git)
+scm_type = "github"
+
+
+# Authentication Method
+# - "app": GitHub App authentication (only available with scm_type="github")
+# - "userpass": Username/Password or token (works with any Git server via HTTP basic auth)
+# - "none": Public repository (no authentication required)
+scm_auth_method = "app"
+
+
+# Repository Configuration
+# Could contains .git at the end (for GitLab is required)
+# GitHub example: https://github.com/owner/repo
+# Gerrit example: https://gerrit.example.com/a/project-name
+# GitLab example: https://gitlab.example.com/group/project.git 
+# Gitea example: https://gitea.example.com/owner/repo
+scm_repo_url = "https://github.com/rajeshvijayanadh/horizon-sdv"
+scm_repo_branch = "main"
+
+
+# Username/Password Authentication (only when scm_auth_method = "userpass")
+# For GitHub with PAT:
+#   scm_username = "git"
+#   scm_password = "ghp_xxxxxxxxxxxxxxxxxxxx"
+# For Gerrit:
+#   scm_username = "your-gerrit-username"
+#   scm_password = "your-http-password"
+# For GitLab:
+#   scm_username = "your-gitlab-username" (could be any not empty string)
+#   scm_password = "glpat-xxxxxxxxxxxxxxxxxxxx"
+scm_username = "git"
+scm_password = "<REQUIRED>"
+
+# GitHub App Authentication (only if scm_auth_method = "app")
+sdv_github_app_id         = "<OPTIONAL>"
+sdv_github_app_install_id = "<OPTIONAL>"
+
+# Generated as a part of GitHub App creation.
+# Replace with actual value if selected auth type is `app`
+sdv_github_app_private_key = <<EOT
+-----BEGIN RSA PRIVATE KEY-----
+... paste content here ...
+-----END RSA PRIVATE KEY-----
+EOT
+
+# ========================================
+# Configuration Examples
+# ========================================
+
+# Example 1: GitHub with Personal Access Token
+# scm_type = "github"
+# scm_auth_method = "userpass"
+# scm_repo_url = "https://github.com/myorg/acn-horizon-sdv"
+# scm_repo_branch = "main"
+# scm_username = "git"
+# scm_password = "ghp_xxxxxxxxxxxxxxxxxxxx"
+
+# Example 2: GitHub with App Authentication
+# scm_type = "github"
+# scm_auth_method = "app"
+# scm_repo_url = "https://github.com/myorg/acn-horizon-sdv"
+# scm_repo_branch = "main"
+# sdv_github_app_id = "123456"
+# sdv_github_app_install_id = "78910"
+# sdv_github_app_private_key = "..."
+
+# Example 3: Gerrit with HTTP Authentication
+# scm_type = "git"
+# scm_auth_method = "userpass"
+# scm_repo_url = "https://gerrit.mycompany.com/a/horizon-sdv"
+# scm_repo_branch = "master"
+# scm_username = "john.doe"
+# scm_password = "my-http-password"
+
+# Example 4: GitLab with Personal Access Token
+# scm_type = "git"
+# scm_auth_method = "userpass"
+# scm_repo_url = "https://gitlab.com/mygroup/acn-horizon-sdv.git"
+# scm_repo_branch = "main"
+# scm_username = "oauth2"
+# scm_password = "glpat-xxxxxxxxxxxxxxxxxxxx"
+
+# Example 5: Public Repository (no authentication)
+# scm_type = "github"  # or "git" for other public Git servers
+# scm_auth_method = "none"
+# scm_repo_url = "https://github.com/open-source-org/public-repo"
+# scm_repo_branch = "main"
+# # No scm_username or scm_password needed
+
+# ========================================
+# Required Admin Secrets
+# These are NOT auto-generated by Terraform and must be provided.
+# ========================================
+
+# Keycloak Admin Password (Plain text)
+sdv_keycloak_admin_password = "Harbor-Stone!84"
+
+# Keycloak Horizon Realm Admin Password (Plain text)
+sdv_keycloak_horizon_admin_password = "Canyon-Breeze#62"
+
+# ========================================
+# ARM64 Cuttlefish
+# ========================================
+# enable_arm64_dedicated_subnet was previously enable_arm64. See upgrade_guide_4_0_0_to_4_1_0.md §2b.
+# Brownfield = existing 4.0 dedicated ARM64 (true + block below). Greenfield = new env (true + greenfield block).
+# Brownfield→greenfield = apply false (brownfield), then apply true (greenfield). false = comment out arm64_*.
+enable_arm64_dedicated_subnet = true
+
+#
+# --- Brownfield: <=4.0,0 to 4.1.0 upgrade - existing dedicated ARM64 (match your GCP) ---
+arm64_region                          = "us-central1"
+arm64_zone                            = "us-central1-b"
+arm64_subnetwork                      = "sdv-subnet-us"
+arm64_pods_secondary_range_name       = "pods-range-us"
+arm64_services_secondary_range_name   = "services-range-us"
+#
+# --- Greenfield: new env (comment out brownfield above).
+#     Brownfield -> Greenfield
+#         - Switch: enable_arm64_dedicated_subnet=false.
+#         - Uncomment Brownfield defaults variables and apply,
+#         - Switch: enable_arm64_dedicated_subnet=true
+#         - Comment out Brownfield, uncomment Greenfield below and apply . ---
+# arm64_region must be allowed by org policy (resourceLocations). Example:
+# arm64_region                          = "us-central1"
+# arm64_zone                            = "us-central1-c"
+# arm64_subnetwork                      = "sdv-subnet-arm64"
+# arm64_pods_secondary_range_name       = "pods-range-arm64"      # optional; same as Terraform default
+# arm64_services_secondary_range_name   = "services-range-arm64"  # optional; same as Terraform default
+
+# ========================================
+# GKE cluster
+# ========================================
+
+# ----------------------------------------
+# GKE: release channel & version
+# ----------------------------------------
+# `sdv_cluster_version` — control plane min_master_version (GKE version string). This is
+# a minimum (floor), not an exact pin: the API-reported master version can be higher
+# (e.g. after GKE updated the control plane, or on a release channel). Setting a lower
+# value here does not downgrade an already-newer control plane. See GKE version policy.
+#
+# `sdv_cluster_release_channel` — GKE release channel: RAPID, REGULAR, STABLE, EXTENDED,
+# or UNSPECIFIED. Default UNSPECIFIED. Invalid values fail on plan/apply (provider API),
+# not from a Terraform enum. Overview:
+#   https://docs.cloud.google.com/kubernetes-engine/docs/concepts/release-channels
+#
+# The ABFS pool's management.auto_upgrade is derived from this variable inside
+# the sdv-gke-cluster module:
+#   UNSPECIFIED                    → auto_upgrade = false  (CASFS kernel-module pin)
+#   RAPID / REGULAR / STABLE / EXTENDED
+#                                  → auto_upgrade = true   (required by GKE on
+#                                    channel-enrolled clusters; auto_upgrade = false
+#                                    is rejected at apply time).
+#
+# Maintenance exclusions (which scopes the API will accept for this channel):
+#   UNSPECIFIED                    → scope = NO_UPGRADES only.
+#   RAPID / REGULAR / STABLE / EXTENDED
+#                                  → NO_UPGRADES, NO_MINOR_UPGRADES, and
+#                                    NO_MINOR_OR_NODE_UPGRADES all available.
+#
+# Choose carefully: switching channels changes upgrade cadence, node-pool upgrade
+# policy (ABFS in particular), and which exclusion scopes the API will accept.
+#
+# Config Connector: the GKE Config Connector add-on is disabled
+# (`config_connector_config.enabled = false` in sdv-gke-cluster). KCC runs as a
+# Git-pinned operator (gitops/apps/configconnector-operator). Do not re-enable the
+# add-on after this pin: Google forbids CRD downgrade if the operator CRDs are
+# newer than the add-on bundle. EXTENDED is no longer blocked by the add-on.
+# Cutover: inventory CNRM → apply Terraform (add-on off) → wait for add-on
+# teardown → Argo sync of the pinned operator beside the existing ConfigConnector CR.
+#   https://cloud.google.com/config-connector/docs/how-to/install-manually
+#   https://cloud.google.com/config-connector/docs/overview
+sdv_cluster_version         = "1.34.9-gke.1322001"
+
+# For channel-based clusters (RAPID/REGULAR/STABLE), use maintenance exclusions to temporarily block auto-upgrades.
+sdv_cluster_release_channel = "STABLE"
+
+# ----------------------------------------
+# GKE: recurring maintenance window
+# ----------------------------------------
+# When GKE may run control-plane auto-upgrades (RRULE, UTC). Details:
+#   https://docs.cloud.google.com/kubernetes-engine/docs/concepts/maintenance-windows-and-exclusions#maintenance_windows
+sdv_cluster_maintenance_recurring_window_start_time = "2025-01-04T00:00:00Z"
+sdv_cluster_maintenance_recurring_window_end_time   = "2050-01-05T00:00:00Z"
+sdv_cluster_maintenance_recurring_window_recurrence = "FREQ=WEEKLY;BYDAY=SA,SU"
+
+# ----------------------------------------
+# GKE: maintenance exclusions
+# ----------------------------------------
+# Optional windows that block some automatic upgrades. Scopes/limits are defined by GKE:
+#   https://docs.cloud.google.com/kubernetes-engine/docs/concepts/maintenance-windows-and-exclusions
+#
+# Key rule: when moving from `UNSPECIFIED` to a release channel and you want `NO_MINOR_*`,
+# do it in "two applies":
+#   1) set `sdv_cluster_release_channel` (and keep `sdv_cluster_maintenance_exclusions = []`)
+#   2) add the `NO_MINOR_*` exclusions
+#
+# Example: `NO_MINOR_OR_NODE_UPGRADES` (valid only when on RAPID/REGULAR/STABLE/EXTENDED):
+#
+# Update the exclusion start/end dates to match your planned maintenance window before applying.
+ sdv_cluster_maintenance_exclusions = [
+   {
+     exclusion_name = "sdv-summer-2026-defer-minor-and-node-upgrades"
+     start_time     = "2026-04-01T00:00:00Z"
+     end_time       = "2026-08-02T00:00:00Z"
+     scope          = "NO_MINOR_OR_NODE_UPGRADES"
+   }
+ ]
+
+# ----------------------------------------
+# GKE: ABFS Ubuntu build node pool (CASFS) — via abfs-client-module-ubuntu (KCC)
+# ----------------------------------------
+# `sdv_abfs_build_node_pool_version` — CASFS-compatible GKE node version for the KCC pool.
+# Applied only when `sdv_cluster_release_channel` is UNSPECIFIED (autoUpgrade false).
+# On RAPID/REGULAR/STABLE/EXTENDED, autoUpgrade is required true; this value is not used as a
+# lasting pin — use maintenance exclusions (NO_MINOR_OR_NODE_UPGRADES) for CASFS-sensitive windows.
+sdv_abfs_build_node_pool_version = "1.32.7-gke.1079000"
+
+# ========================================
+# Network Policies Configuration
+# ========================================
+# Enable/disable network policies for all workloads
+# Set to false to disable all NetworkPolicy resources (useful for debugging connectivity issues)
+# Default: true (network policies enabled for security)
+sdv_enable_network_policies = true
+# Optional: DNSSEC Configuration
+# Enable DNSSEC for Cloud DNS zone. Requires domain ownership verification.
+# Set to true to enable DNSSEC (default, you must verify domain ownership at https://search.google.com/search-console)
+# Set to false to disable DNSSEC
+sdv_dns_dnssec_enabled = true
+
+# Optional: Static A records (no zone delegation)
+# Set to true to use static A records in parent zone: no Cloud DNS zone, cert uses Load Balancer auth.
+# Add A records (domain and mcp.domain) to parent zone manually; LB IP is visible in GCP Console.
+sdv_dns_use_static_a_records = false
+
+# Optional: KMS Encryption for GKE Secrets
+# Enable KMS encryption for Kubernetes secrets at rest using customer-managed encryption keys.
+# WARNING: Once enabled and applied, KMS keyrings CANNOT be deleted from GCP (by design for security/compliance).
+#          The only way to remove them is to delete the entire project.
+# Set to false (default) to skip KMS encryption - allows clean terraform destroy
+# Set to true to enable application-layer secrets encryption with Cloud KMS
+sdv_enable_kms_encryption = false
+
+# To set secret manually, uncomment required secret
+# s5  : Argo CD Admin
+# s6  : Jenkins Admin
+# s9  : Gerrit Admin
+# s12 : Grafana Admin
+# s14 : PostgreSQL Admin
+# s17 : MCP Gateway Registry Admin
+
+manual_secrets = {
+  s5  = "Meadow-Glade!47"
+  s6  = "Summit-Trail@93"
+  s9  = "Cobalt-Shore#28"
+  s12 = "Amber-Valley$75"
+  s14 = "Cedar-Ridge%51"
+  s17 = "Horizon-Peak*86"
+}
+
+# --- SUB-ENVIRONMENTS CONFIGURATION (OPTIONAL) ---
+# Define sub-environments as keys in the map below.
+# Each key is the sub-environment name (e.g., "dev", "staging").
+
+# sdv_sub_env_configs = {
+#   dev = {
+#     # Required: Keycloak passwords for this sub-env
+#     keycloak_admin_password         = "Change_Me_123"
+#     keycloak_horizon_admin_password = "Change_Me_123"
+#
+#     # Optional: Git branch for this sub-env's ArgoCD sync (defaults to scm_repo_branch)
+#     # branch = "dev"
+#
+#     # Optional: Auto-generated passwords for specific secrets
+#     manual_secrets = {
+#       # s5  = "Change_Me_123"
+#       # s6  = "Change_Me_123"
+#       # s9  = "Change_Me_123"
+#       # s12 = "Change_Me_123"
+#       # s14 = "Change_Me_123"
+#       # s17 = "Change_Me_123"
+#     }
+#   }
+# }
